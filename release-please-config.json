@@ -2,7 +2,7 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "version-file": "VERSION.txt"
+      "version-file": "version.txt"
     }
   }
 }
