@@ -11,12 +11,16 @@ class OllamaError(Exception):
     """Raised when the Ollama server cannot be reached or returns an error."""
 
 
+DEFAULT_BASE_URL = "http://localhost:11434"
+DEFAULT_MODEL = "llama3.2:1b"
+
+
 def get_base_url():
-    return os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    return os.getenv("OLLAMA_BASE_URL", DEFAULT_BASE_URL)
 
 
 def get_model():
-    return os.getenv("OLLAMA_MODEL", "llama3.2:1b")
+    return os.getenv("OLLAMA_MODEL", DEFAULT_MODEL)
 
 
 def _request(method, path, payload=None, timeout=120):

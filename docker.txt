@@ -1,0 +1,13 @@
+## docker build --target test
+#15 0.906 ============================== 7 passed in 0.22s ===============================
+## version
+llm.py 0.1.0
+## user
+uid=10001(app) gid=10001(app) groups=10001(app)
+## status
+Ollama is running at http://host.docker.internal:11434
+## status (--network host)
+Ollama is running at http://localhost:11434
+## stop
+stopped in 0.172 s
+exit code 143
