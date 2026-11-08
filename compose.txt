@@ -1,9 +1,12 @@
-## dockerfile
-1
-llm.py 0.1.0
-## config
-compose.yaml is valid
-## llm status
-Ollama is running at http://localhost:11434
-## storage
-ls: compose.storage.yaml: No such file or directory
+## up
+ollama-pull: Exited (0) 29 seconds ago 
+ollama-server: Up 6 minutes (healthy) 11434/tcp
+open-webui: Up 5 minutes (healthy) 127.0.0.1:3000->8080/tcp
+## status
+Ollama is running at http://ollama-server:11434
+## persist
+ollama-pull: Exited (0) 29 seconds ago 
+ollama-server: Up 35 seconds (healthy) 11434/tcp
+open-webui: Up 30 seconds (healthy) 127.0.0.1:3000->8080/tcp
+NAME           ID              SIZE      MODIFIED       
+llama3.2:1b    baf6a787fdff    1.3 GB    29 seconds ago    
