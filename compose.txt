@@ -1,0 +1,9 @@
+## dockerfile
+1
+llm.py 0.1.0
+## config
+compose.yaml is valid
+## llm status
+Ollama is running at http://localhost:11434
+## storage
+ls: compose.storage.yaml: No such file or directory
