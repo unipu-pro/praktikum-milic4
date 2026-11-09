@@ -1,15 +1,64 @@
-# Week 4, block B: the CLI as a Compose service.
-# It uses the HOST network: inside the container localhost:11434 is the Ollama
-# that runs on your machine (from week 2), exactly like `docker run --network host`.
+# Week 4, block C: the CLI, Ollama and Open WebUI as Compose services.
 name: praktikum
 
 services:
+  ollama-server:
+    image: ollama/ollama:0.40.13
+    volumes:
+      - ollama-models:/root/.ollama      # named volume: models survive `down` and image upgrades
+    # No `ports:`: only containers on the same network can reach Ollama, the host cannot.
+    healthcheck:
+      test: ["CMD", "ollama", "list"]    # the image has no curl; the ollama CLI asks the server
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+    networks: [backend]
+    restart: unless-stopped
+
+  ollama-pull:
+    # One-shot job: same image, but only the CLI, which pulls the model into ollama-server and exits.
+    image: ollama/ollama:0.40.13
+    entrypoint: ["ollama", "pull", "${OLLAMA_MODEL:-llama3.2:1b}"]
+    environment:
+      OLLAMA_HOST: http://ollama-server:11434   # where the ollama CLI sends its requests
+    networks: [backend]
+    depends_on:
+      ollama-server:
+        condition: service_healthy
+    restart: "no"
+
   llm:
     build:
       context: .
     image: praktikum-llm
-    network_mode: host
     environment:
-      OLLAMA_BASE_URL: http://localhost:11434
+      OLLAMA_BASE_URL: http://ollama-server:11434   # container DNS name instead of localhost
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:1b}
+    networks: [backend]
+    depends_on:
+      ollama-pull:
+        condition: service_completed_successfully
     profiles: [cli]              # not started by `docker compose up`, only by `docker compose run llm ...`
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.7.2
+    ports:
+      - "127.0.0.1:3000:8080"            # http://localhost:3000, only from this machine
+    environment:
+      OLLAMA_BASE_URL: http://ollama-server:11434
+      WEBUI_AUTH: "False"                # single-user local setup; never on a shared server
+    volumes:
+      - open-webui-data:/app/backend/data
+    networks: [backend]
+    depends_on:
+      ollama-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  ollama-models:
+  open-webui-data:
+
+networks:
+  backend:                       # user-defined bridge: DNS by service name, isolated from other projects
