@@ -13,4 +13,4 @@ def test_read_version_matches_version_file():
 def test_read_version_falls_back_when_file_is_missing(monkeypatch, tmp_path):
     monkeypatch.setattr(llm, "VERSION_FILE", tmp_path / "missing.txt")
 
-    assert llm.read_version() == "0.0.1"
+    assert llm.read_version() == "0.0.0"
