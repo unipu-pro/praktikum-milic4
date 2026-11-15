@@ -1,0 +1,25 @@
+name: hello
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      greeting:
+        description: "Word to greet with"
+        type: string
+        default: Hello
+      show-context:
+        description: "Print the whole github context"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hello, world
+        run: echo "Hello, world from job ${{ github.job }}"
