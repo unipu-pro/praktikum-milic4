@@ -20,6 +20,8 @@ permissions:
 jobs:
   hello:
     runs-on: ubuntu-latest
+    outputs:
+      message: ${{ steps.compose.outputs.message }}
     steps:
       - name: Hello, world
         run: echo "Hello, world from job ${{ github.job }}"
@@ -49,3 +51,25 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
+
+      - name: Compose a message
+        id: compose
+        env:
+          GREETING: ${{ inputs.greeting || 'Hello' }}
+        run: echo "message=$GREETING from $GITHUB_ACTOR, version $(cat version.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Job summary
+        run: |
+          echo "### ${{ steps.compose.outputs.message }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Triggered by \`${{ github.event_name }}\` on \`${{ github.ref_name }}\`." >> "$GITHUB_STEP_SUMMARY"
+
+  goodbye:
+    needs: hello
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read the output of the previous job
+        env:
+          MESSAGE: ${{ needs.hello.outputs.message }}
+        run: |
+          echo "hello said: $MESSAGE"
+          ls -la "$GITHUB_WORKSPACE"
