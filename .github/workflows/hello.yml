@@ -23,3 +23,29 @@ jobs:
     steps:
       - name: Hello, world
         run: echo "Hello, world from job ${{ github.job }}"
+
+      - name: Who, what, where
+        run: |
+          echo "event:      ${{ github.event_name }}"
+          echo "repository: $GITHUB_REPOSITORY"
+          echo "ref:        $GITHUB_REF  (sha ${GITHUB_SHA::7})"
+          echo "actor:      $GITHUB_ACTOR"
+          echo "runner:     $RUNNER_OS / $RUNNER_ARCH, $(nproc) CPUs"
+
+      - name: An ephemeral machine starts empty
+        run: |
+          echo "workspace: $GITHUB_WORKSPACE"
+          ls -la "$GITHUB_WORKSPACE"
+          whoami; uname -r; df -h / | tail -1
+
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Now the code is here
+        run: ls -la && cat version.txt
+
+      - name: Print the github context
+        if: github.event_name != 'workflow_dispatch' || inputs.show-context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
