@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  pull_request:
+    types:
+      - opened                           # the PR is created
+      - synchronize                      # a new commit is pushed to the PR branch
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Unit tests
+        run: python -m pytest -v --junitxml=pytest-report.xml
+
+      - name: Upload the test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pytest-report
+          path: pytest-report.xml
